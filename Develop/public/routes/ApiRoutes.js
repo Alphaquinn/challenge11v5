@@ -1,15 +1,19 @@
 const router = require("express").Router();
-const fs = require("fs");
-const {v4: uuidv4}=require('uuid');
+const cache = require("../db/cache")
+
 
 
 //all notes route
 
 router.get("/notes", (req,res)=>{
-    let db = fs.readFileSync("db/db.json");
-    db = JSON.parse(db);
-    res.json(db);
-})
+    cache
+    .getNotes()
+    .then((notes)=>{
+        return res.json(notes);
+    })
+    .catch((err)=> res.status(500).json(err));
+    
+});
 
 
 
@@ -18,26 +22,22 @@ router.get("/notes", (req,res)=>{
 
 
 router.post("/notes", (req, res)=> {
-    let note = req.body;
-    note.id=uuidv4();
-    let db = fs.readFileSync("db/db.json");
-    db = JSON.parse(db);
-    db.push(note);
-    fs.writeFileSync("db/db.json", JSON.stringify(db));
-    res.json(db);
-})
+   cache
+   .addNote(req.body)
+   .then((note)=>res.json(note))
+   .catch((err)=>res.status(500).json(err));
+});
 
 //this route is for delteing notes(need those extra points)
 
-
 router.delete("/notes/:id",(req,res)=>{
-    let idNote = req.params.id;
-    let db = fs.readFileSync("db/db.json");
-    db = JSON.parse(db);
-    let allNotes = db.filter(note=>note.id!==idNote);
-    fs.writeFileSync("db/db.json", JSON.stringify(allNotes));
-    res.json(allNotes);
-})
+    const noteId = req.params.id;
+    cache
+    .removeNoteById(noteId)
+    .then(()=>res.sendStatus(204))
+    .catch((err)=>res.status(500));
+});
+
 
 
 module.exports=router
