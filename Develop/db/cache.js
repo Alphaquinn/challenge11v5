@@ -7,8 +7,7 @@ const writeFileAsync= util.promisify(fs.writeFile);
 class cache{
     read(){
         return readFileAsync('db/db.json','utf8');
-
-    }
+        }
     write(note){
         return writeFileAsync('db/db.json', JSON.stringify(note));
 
@@ -16,12 +15,9 @@ class cache{
     getNotes(){
         return thisread().then((notes)=>{
             let parsedNotes;
-try{
-    parsedNotes=[].comcat(JSON.parse(notes));
+try{parsedNotes=[].comcat(JSON.parse(notes));
 
-}catch(err){
-    parsedNotes=[];
-
+}catch(err){parsedNotes=[];
 }
 return parsedNotes;
         });
@@ -30,8 +26,7 @@ return parsedNotes;
         const {title, text}=note;
         if(!title||!text){
             throw new Error("this notes title or text cannot be left blank");
-
-        }
+         }
 
         const newNote ={title,text,id:uuidv1()};
         return this.getNotes()
